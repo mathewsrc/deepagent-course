@@ -1,0 +1,13 @@
+[project]
+name = "deepagent-course"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain>=1.0.2",
+    "langchain-groq>=1.0.0",
+    "langgraph>=1.0.1",
+    "langsmith>=0.4.38",
+    "ruff>=0.14.2",
+]
