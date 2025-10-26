@@ -3,3 +3,4 @@ langgraph
 langsmith
 langchain_groq
 ruff
+gradio

@@ -117,18 +117,27 @@ def call_agent(state: State):
 
     return {"messages": content, "response_metadata": metadata}
 
-def graph():
+def graph(state: dict | None = None):
+    """Compile the StateGraph and invoke it with the provided `state`.
+
+    Args:
+        state: A dict matching the State schema, e.g. {"messages": [...], "role": "Dev"}.
+               If None, a default weather query state will be used.
+
+    Returns:
+        The result of the graph invocation (whatever the `call_agent` node returns).
+    """
     print("Compiling graph...")
-    
+
     chatbot = StateGraph(state_schema=State)
     chatbot.add_node("chat", call_agent)
     chatbot.add_edge(START, "chat")
     chatbot.add_edge("chat", END)
-    
+
     chatbot = chatbot.compile(name="chatbot",
                     checkpointer=InMemorySaver(),
                     store=InMemoryStore())
-    
+
     config = RunnableConfig(
             {
             "configurable": {
@@ -139,17 +148,18 @@ def graph():
             "run_name": "chatbot_run"
             }
         )
-    
-    # Pass messages as a list of message dicts per the State schema.
-    result = chatbot.invoke(
-        {
+
+    # Default state if none provided
+    if state is None:
+        state = {
             "messages": [{"role": "user", "content": "What is the weather of vancouver?"}],
             "role": "Dev",
-        },
-        config=config,
-    )
+        }
+
+    # Invoke the compiled graph and return the result to the caller
+    result = chatbot.invoke(state, config=config)
     print("Final result: ", result)
-    
+    return result
 
 
 if __name__ == "__main__":
